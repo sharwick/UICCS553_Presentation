@@ -19,11 +19,26 @@
 \end{frame}
 
 
+
 % --------------------------------------------------- Slide --
 
 \section{Li et al.} 
+
 \begin{frame}
-\frametitle{Example 1}
+\frametitle{Paper 1: Li et al.}
+
+\textbf{Title} \newline
+\textit{Source} \newline
+Authors\newline
+Date\newline
+
+\end{frame}
+
+
+% --------------------------------------------------- Slide --
+
+\begin{frame}
+\frametitle{Overview}
 
 \begin{theorem}<1->
 Every finite distributive lattice can be embedded in a boolean lattice.
@@ -45,18 +60,143 @@ Use join-irreducible elements.
 \end{itemize}  
 \end{frame}
 
+
+
+%%% BEGIN SHANNON SECTION %%%
 % --------------------------------------------------- Slide --
 
 \section{Lloyd et al.} 
 
 \begin{frame}
-\frametitle{Example 3}
+\frametitle{Paper 2: Lloyd et al.}
+
+\textbf{Stronger Semantics for Low-Latency Geo-Replicated Storage} \newline
+\textit{Proceedings of the 10th USENIX Symposium on Networked Systems Design and Implementation (NSDI’13)} \newline
+Wyatt Lloyd, Michael J. Freedman, Michael Kaminsky, and David G. Andersen \newline
+April 2013 \newline
+
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Main Idea}
 \begin{itemize}
-\pause \item a local maximum, or % Each \pause creates a new slide within the frame.
-\pause \item a local minimum, or
-\pause \item an inflection point.
+
+\pause \item Take slight hit in throughput to get stronger version of consistency
+\pause \item Causal Consistency Instead of Eventual Consistency (causal is stronger)
+\pause \item We require low latency
+\pause \item Extend previous systems: Cassandra and COPS
+
 \end{itemize}  
 \end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Contributions}
+\begin{itemize}
+\pause \item Eiger
+	\begin{itemize}
+		\item Low Latency
+		\item High throughput (slightly lower than Cassandra)
+		\item Causal Consistency (rather than eventual as in Cassandra)
+	\end{itemize}
+\pause \item Read Only Algorithm
+\pause \item Write Only Algorithm
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Background}
+\begin{itemize}
+\pause \item Cassandra
+	\begin{itemize}
+		\item Eventual Consistency
+	\end{itemize}
+\pause \item COPS
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Consistency - Causal versus Eventual}
+\begin{itemize}
+\pause \item p1	
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Column Family Data Model}
+\begin{itemize}
+\pause \item p1 % Each \pause creates a new slide within the frame.
+\pause \item p2
+\pause \item p3
+\end{itemize}  
+\end{frame}
+
+
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger}
+\begin{itemize}
+\pause \item p1 % Each \pause creates a new slide within the frame.
+\pause \item p2
+\pause \item p3
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Evaluation}
+\begin{itemize}
+\pause \item Versus Cassandra
+		\begin{itemize}
+			\item Within 7\% of throughput Using Facebook-like data
+			\begin{itemize}
+				\item Ops/sec
+				\item Keys/sec
+				\item Columns/sec
+			\end{itemize}
+		\end{itemize}
+\pause \item Versus COPS
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Follow Up Research}
+\begin{itemize}
+\pause \item p1 
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Ideas for Future Research}
+\begin{itemize}
+\pause \item p1 
+\end{itemize}  
+\end{frame}
+
+
+% --------------------------------------------------- Slide --
+
+\section{Bibliography} 
+
+\begin{frame}
+\frametitle{Bibliography}
+
+\begin{itemize}
+\item \textbf{Stronger Semantics for Low-Latency Geo-Replicated Storage}, 
+\textit{Proceedings of the 10th USENIX Symposium on Networked Systems Design and Implementation (NSDI’13)}, 
+Wyatt Lloyd, Michael J. Freedman, Michael Kaminsky, and David G. Andersen, 
+April 2013
+
+\end{itemize}  
+\end{frame}
+
 
 
 
