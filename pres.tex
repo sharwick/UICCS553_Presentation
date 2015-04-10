@@ -13,51 +13,154 @@
 \begin{document}
 
 
-% --------------------------------------------------- Slide --
-\begin{frame}[plain]
-  \titlepage
-\end{frame}
-
-
-
-% --------------------------------------------------- Slide --
+% --------------------------------------------------- Slide --0
 
 \section{Li et al.} 
 
 \begin{frame}
 \frametitle{Paper 1: Li et al.}
 
-\textbf{Title} \newline
-\textit{Source} \newline
+\textbf{Title} Making Geo-Replicated Systems Fast as Possible,Consistent when necessary\newline
+\textit{10th USENIX Symposium on Operating Systems Design and Implementation} \newline
 Authors\newline
 Date\newline
 
 \end{frame}
 
-
-% --------------------------------------------------- Slide --
+% --------------------------------------------------- Slide --1
 
 \begin{frame}
-\frametitle{Overview}
+\frametitle{Motivation:}
+\begin{enumerate}
+\item To improve user-experience, services replicate  system state across geographical diverse sites.
+\item Performance vs Consistency
+\begin{itemize}
+\item Amazon\'s Dynamo - eventual consistency where state temporarily diverge.
+\item Yahoo PNUTS - avoids state divergence by requiring all operations that update the service state to be funneled through a primary site and thus incurring increased latency.
+\end{itemize}
+\end{enumerate}
 
-\begin{theorem}<1->
-Every finite distributive lattice can be embedded in a boolean lattice.
-\end{theorem}
-\begin{proof}<3->
-Use join-irreducible elements.
-\end{proof}
 \end{frame}
 
 
+% --------------------------------------------------- Slide --2
 
-% --------------------------------------------------- Slide --
 \begin{frame}
-\frametitle{Example 2}
-\begin{itemize}
-\pause \item a local maximum, or % Each \pause creates a new slide within the frame.
-\pause \item a local minimum, or
-\pause \item an inflection point.
-\end{itemize}  
+\frametitle{Overview:}
+\begin{enumerate}
+\item RedBlue Consistency - Blue operations execute locally and are lazily replicated.Red operations are serialized with respect to each other and are immediately cross-site coordinated.
+\item Conditions under which operations must be colored red or blue.
+\item Decomposing operations into two components - a generator operation and a shadow operation.
+\end{enumerate}
+
+\end{frame}
+
+
+% --------------------------------------------------- Slide --3
+
+\begin{frame}
+\frametitle{Properties of Geo-Replicated Systems}
+\begin{enumerate}
+\item Low latency - Operations should proceed after contacting a small number of users.
+\item Causality - Monotonicity of user request within session and also preserving causality across clients
+\item State Convergence - All replicas have executed the same set of operations
+\item All operations should return a single value.
+\item The system should provide a set of stable histories and support for general operations.
+\item The system should preserve a set of invariants.
+\item Eventual Propagation
+\end{enumerate}
+\end{frame}
+% --------------------------------------------------- Slide --4
+
+\begin{frame}
+\frametitle{Related Work: Target end-to-end Properties}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic1.jpg}
+\centering
+\end{figure}
+\end{frame}
+
+% --------------------------------------------------- Slide --5
+
+\begin{frame}
+\frametitle{Related Work: Strong vs Weak Consistency}
+\begin{enumerate}
+\item
+\end{enumerate}
+
+\end{frame}
+
+
+% --------------------------------------------------- Slide --6
+
+\begin{frame}
+\frametitle{Related Work: Other}
+\begin{enumerate}
+\item
+\end{enumerate}
+
+\end{frame}
+
+
+% --------------------------------------------------- Slide --7
+
+\begin{frame}
+\frametitle{System Model}
+\begin{enumerate}
+\item
+\end{enumerate}
+
+\end{frame}
+
+% --------------------------------------------------- Slide --8
+
+\begin{frame}
+\frametitle{RedBlue Consistency}
+\begin{enumerate}
+\item
+\end{enumerate}
+
+\end{frame}
+
+
+% --------------------------------------------------- Slide --8
+
+\begin{frame}
+\frametitle{RedBlue Consistency - Definition}
+\begin{enumerate}
+\item
+\end{enumerate}
+
+\end{frame}
+
+% --------------------------------------------------- Slide --8
+
+\begin{frame}
+\frametitle{State Convergence and RedBlue Bank}
+\begin{enumerate}
+\item
+\end{enumerate}
+
+\end{frame}
+
+% --------------------------------------------------- Slide --9
+
+\begin{frame}
+\frametitle{Replicating side effects - Defining shadow operations}
+\begin{enumerate}
+\item
+\end{enumerate}
+
+\end{frame}
+
+% --------------------------------------------------- Slide --10
+
+\begin{frame}
+\frametitle{Revisiting RedBlue consistency}
+\begin{enumerate}
+\item
+\end{enumerate}
+
 \end{frame}
 
 
