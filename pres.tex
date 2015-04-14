@@ -161,6 +161,12 @@ April 2013 \newline
 			\end{itemize}
 		\end{itemize}
 \pause \item Versus COPS
+		\begin{itemize}	
+			\item Both have low latency
+			\item Eiger has slightly higher latency due to 2nd round indirection
+			\item Only Eiger has write transactions
+			\item Eiger has less overhead because it tracks only one-hop dependencies
+		\end{itemize}
 \end{itemize}  
 \end{frame}
 
@@ -168,7 +174,7 @@ April 2013 \newline
 \begin{frame}
 \frametitle{Follow Up Research}
 \begin{itemize}
-\pause \item p1 
+\pause \item Mahajan et al. showed that Causal Consistency strongest that guarantees low latency.
 \end{itemize}  
 \end{frame}
 
@@ -188,11 +194,22 @@ April 2013 \newline
 \begin{frame}
 \frametitle{Bibliography}
 
+
+%%% SHANNON'S REFERENCES
 \begin{itemize}
 \item \textbf{Stronger Semantics for Low-Latency Geo-Replicated Storage}, 
 \textit{Proceedings of the 10th USENIX Symposium on Networked Systems Design and Implementation (NSDI’13)}, 
 Wyatt Lloyd, Michael J. Freedman, Michael Kaminsky, and David G. Andersen, 
 April 2013
+
+\item \textbf{Out in the Open: The Abandoned Facebook Tech That Now Helps Power Apple}, 
+\textit{www.wired.com}
+, Klint Finley, Aug. 4, 2014
+
+\item \textbf{A Short Primer on Causal Consistency}, 
+\textit{;login: The Usenix Magazine Volume 38, Number 4}, 
+Wyatt Lloyd, Michael J. Freedman, Michael Kaminsky, and David G. Andersen, , August 2013
+
 
 \end{itemize}  
 \end{frame}
