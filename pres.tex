@@ -1,5 +1,7 @@
 \documentclass{beamer}
 %\usetheme{default}    
+\usepackage{graphicx}
+
 \usetheme{Berkeley}    
 \usecolortheme{crane}
 
@@ -182,20 +184,60 @@ April 2013 \newline
 
 % --------------------------------------------------- Slide --
 \begin{frame}
-\frametitle{Main Idea}
+\frametitle{Motivation}
 \begin{itemize}
 
-\pause \item Take slight hit in throughput to get stronger version of consistency
-\pause \item Causal Consistency Instead of Eventual Consistency (causal is stronger)
-\pause \item We require low latency
-\pause \item Extend previous systems: Cassandra and COPS
+\item Consider an example from Facebook
+\pause\item Joe performs 2 actions:
+	\begin{itemize}
+		\pause\item Defriend boss.
+		\pause\item Make snarky comment about boss and promise to quit.
+	\end{itemize}
+\pause\item In an \textcolor{red}{eventually} consistent system, these can be viewed in the wrong order for a period time, earning Joe his first unemployment check.
+\pause\item This won't happen with \textcolor{green}{causal} consistency.
 
 \end{itemize}  
 \end{frame}
 
 % --------------------------------------------------- Slide --
 \begin{frame}
-\frametitle{Contributions}
+\frametitle{Consistency - Causal versus Eventual}
+\begin{itemize}
+\pause \item Eventual Consistency
+	\begin{itemize}
+		\item At some point, the replicas will converge
+		\item Until then, no guarantees
+		\pause\item \textcolor{red}{Joe's boss might see his whining.}	
+	\end{itemize}
+
+\pause \item Causal Consistency
+	\begin{itemize}
+		\item At a single processor, serial order of events determines causal order
+		\item Reads are causally ordered after their writes across processors
+		\item Transitive closure of these two properties
+		\pause\item \textcolor{green}{Joe is safe to gripe.}
+	\end{itemize}
+
+\end{itemize}  
+\end{frame}
+
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Overview}
+\begin{itemize}
+
+\item We modify an eventually consistent system to get a causally consistent one
+\item Extend Cassandra to get Eiger
+\pause \item Take slight hit in \textcolor{red}{throughput} \newline to get stronger version of \textcolor{green}{consistency}
+\pause \item Maintain low latency
+
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Contributions of the paper} 
 \begin{itemize}
 \pause \item Eiger
 	\begin{itemize}
@@ -214,47 +256,98 @@ April 2013 \newline
 \begin{itemize}
 \pause \item Cassandra
 	\begin{itemize}
-		\item Eventual Consistency
+		\item Designed by Facebook to search inbox messages (has since been replaced by Hbase for better scalability)
+		\item Other companies are still using Cassandra (e.g., Netflix and Apple)
+		\item Allows Eventual or Strong Consistency
+		\item If you want low latency, Eventual is the only option
 	\end{itemize}
-\pause \item COPS
+%\pause \item COPS
 \end{itemize}  
 \end{frame}
 
-% --------------------------------------------------- Slide --
-\begin{frame}
-\frametitle{Consistency - Causal versus Eventual}
-\begin{itemize}
-\pause \item p1	
-\end{itemize}  
-\end{frame}
 
-% --------------------------------------------------- Slide --
-\begin{frame}
-\frametitle{Column Family Data Model}
-\begin{itemize}
-\pause \item p1 % Each \pause creates a new slide within the frame.
-\pause \item p2
-\pause \item p3
-\end{itemize}  
-\end{frame}
 
 
 
 % --------------------------------------------------- Slide --
 \begin{frame}
-\frametitle{Eiger}
+\frametitle{Eiger: Column Family Data Model}
 \begin{itemize}
-\pause \item p1 % Each \pause creates a new slide within the frame.
-\pause \item p2
-\pause \item p3
+\item Hierarchical Column families: 3 tiers
+
+\pause \item Example:
+	\begin{itemize}
+		\item Super Family = Association
+		\item Family = Friends
+		\item Column = Alice
+	\end{itemize}
+\end{itemize}  
+\includegraphics[scale=0.5]{Figure_Lloyd_ColumnHierarchy.png}
+\end{frame}
+
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: Operations}
+\begin{itemize}
+\pause \item Cassandra has only 3 operations (key determines row)
+	\begin{itemize}
+		\item Insert(table, key, rowMutation)
+		\item Get(table, key, columnName)
+		\item Delete(table, key, columnName)
+	\end{itemize}
+\pause \item Eiger adds more complex transactions
+	\begin{itemize}
+		\item Batch Mutate
+		\item Atomic Mutate
+		\item Multiget Slice
+	\end{itemize}	
 \end{itemize}  
 \end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: Read Algorithm}
+\begin{itemize}
+\pause \item Non-blocking
+\pause \item Partition Tolerant
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: Read Algorithm}
+\begin{itemize}
+\pause \item Example
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: Write Algorithm}
+\begin{itemize}
+\pause \item Atomically write set of keys
+\pause \item Lock free (and thus low latency)
+\pause \item Does not block concurrent reads
+\end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: Write Algorithm}
+\begin{itemize}
+	\item Example:
+\end{itemize}  
+\end{frame}
+
+
+
 
 % --------------------------------------------------- Slide --
 \begin{frame}
 \frametitle{Evaluation}
 \begin{itemize}
-\pause \item Versus Cassandra
+\pause \item Comparison to Cassandra
 		\begin{itemize}
 			\item Within 7\% of throughput Using Facebook-like data
 			\begin{itemize}
@@ -263,19 +356,12 @@ April 2013 \newline
 				\item Columns/sec
 			\end{itemize}
 		\end{itemize}
-\pause \item Versus COPS
-		\begin{itemize}	
-			\item Both have low latency
-			\item Eiger has slightly higher latency due to 2nd round indirection
-			\item Only Eiger has write transactions
-			\item Eiger has less overhead because it tracks only one-hop dependencies
-		\end{itemize}
 \end{itemize}  
 \end{frame}
 
 % --------------------------------------------------- Slide --
 \begin{frame}
-\frametitle{Follow Up Research}
+\frametitle{Related Research}
 \begin{itemize}
 \pause \item Mahajan et al. showed that Causal Consistency strongest that guarantees low latency.
 \end{itemize}  
@@ -283,9 +369,26 @@ April 2013 \newline
 
 % --------------------------------------------------- Slide --
 \begin{frame}
-\frametitle{Ideas for Future Research}
+\frametitle{Conclusion: Relationship between 2 Papers}
 \begin{itemize}
-\pause \item p1 
+\pause \item Similarities
+	\begin{itemize}
+		\item Geo-replicated Systems
+		\item Provide consistency
+		\item Decrease latencies
+	\end{itemize}
+\pause \item Differences
+	\begin{itemize}
+		\item Li: Latency versus Consistency.
+			\begin{itemize}
+				\item Separate operations into those that must be consistent and those that need not.
+			\end{itemize}
+		\item Lloyd: Consistency versus Throughput (requiring low latency)
+			\begin{itemize}
+				\item Extend previous system to offer causal consistency with small hit to throughput.
+			\end{itemize}
+	\end{itemize}
+
 \end{itemize}  
 \end{frame}
 
@@ -313,6 +416,21 @@ April 2013
 \textit{;login: The Usenix Magazine Volume 38, Number 4}, 
 Wyatt Lloyd, Michael J. Freedman, Michael Kaminsky, and David G. Andersen, , August 2013
 
+\item \textbf{Netflix's Viewing Data: How We Know Where You Are in House of Cards},
+\textit{http://techblog.netflix.com/search/label/Cassandra}
+January 27, 2015
+
+
+
+\end{itemize}  
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Bibliography}
+
+\begin{itemize}
+\item \textit{http://wiki.apache.org/cassandra}
 
 \end{itemize}  
 \end{frame}
