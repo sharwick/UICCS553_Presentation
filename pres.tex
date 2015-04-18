@@ -298,9 +298,9 @@ April 2013 \newline
 	\end{itemize}
 \pause \item Eiger adds more complex transactions
 	\begin{itemize}
-		\item Batch Mutate
-		\item Atomic Mutate
-		\item Multiget Slice
+		\item Batch Mutate: insert or delete multiple keys as a group of independent operations
+		\item Atomic Mutate: insert or delete multiple keys in a single atomic batch
+		\item Multiget Slice: read multiple columns/keys
 	\end{itemize}	
 \end{itemize}  
 \end{frame}
@@ -309,24 +309,35 @@ April 2013 \newline
 \begin{frame}
 \frametitle{Eiger: Read Algorithm}
 \begin{itemize}
-\pause \item Non-blocking
-\pause \item Partition Tolerant
+\item Non-blocking
+\item Partition Tolerant
+\item 1 or 2 rounds of non-blocking parallel reads
 \end{itemize}  
 \end{frame}
 
 % --------------------------------------------------- Slide --
 \begin{frame}
 \frametitle{Eiger: Read Algorithm}
+\includegraphics[scale=0.80]{Figure_Read.png}
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: Read Algorithm}
 \begin{itemize}
-\pause \item Example
+\item Step 1: Find latest lower bound, L
+\item Step 2: Find lowest upper bound that is higher than H
+\newline If all upper bounds are higher than L then we are done.  If not, continue. 
+\item Step 3: For any reads that had an upper bound lower than L, read again.
 \end{itemize}  
 \end{frame}
+
 
 % --------------------------------------------------- Slide --
 \begin{frame}
 \frametitle{Eiger: Write Algorithm}
 \begin{itemize}
-\pause \item Atomically write set of keys
+\item Atomically write set of keys
 \pause \item Lock free (and thus low latency)
 \pause \item Does not block concurrent reads
 \end{itemize}  
