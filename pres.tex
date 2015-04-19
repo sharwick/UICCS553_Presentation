@@ -34,7 +34,7 @@ Date\newline
 \begin{frame}
 \frametitle{Motivation:}
 \begin{enumerate}
-\item To improve user-experience, services replicate  system state across geographical diverse sites.
+\item To improve user-experience, services replicate  system state across geographically diverse sites.
 \item Performance vs Consistency
 \begin{itemize}
 \item Amazon\'s Dynamo - eventual consistency where state temporarily converge.
@@ -88,8 +88,8 @@ Date\newline
 \frametitle{Related Work: Levels of Consistency}
 \begin{enumerate}
 \item Strong Consistency - Replicated systems behave like a single server that serialize all operations.
-\item Timeline/Snapshot Consistency - THere is a total order for updates to the service state but gives the option of reading a consistent but dated view of the service.
-\item Fork Consistency - Relaxes strong consistency by allowing users to observe distinct casual histories.
+\item Timeline/Snapshot Consistency - There is a total order for updates to the service state but gives the option of reading a consistent but dated view of the service.
+\item Fork Consistency - Relaxes strong consistency by allowing users to observe distinct causal histories.
 \item Eventual Consistency - All replicas "eventually" diverge at some state.
 \item Multi Consistency - Other systems expose multiple values from divergent branches in operation replies either directly to the client or to an application-specific conflict resolution procedure.
 \item RedBlue Consistency - Operations have multiple consistency levels
@@ -103,8 +103,8 @@ Date\newline
 \begin{frame}
 \frametitle{Related Work: Other}
 \begin{enumerate}
-\item Consistency Rationing - Consistency guarantees associated with the data instead of the operation.Also switches consistency levels at runtime.
-\item TACT - bounds the amount of inconsisteny based on parameters like numeric errors,order errors, staleness etc.
+\item Consistency Rationing - Consistency guarantees associated with the data instead of the operation. Also switches consistency levels at runtime.
+\item TACT - bounds the amount of inconsisteny based on parameters like numeric errors, order errors, staleness, etc.
 \end{enumerate}
 
 \end{frame}
@@ -135,7 +135,7 @@ Date\newline
 
 \item Causal Serialization $\colon$ Given a site $i$, $O_i = (U, <)$ is an $i$-causal serialization(or short, a causal serialization) of RedBlue order $O = ( U, \prec)$ if 
  \begin{enumerate}
-\item$O_i$ is a linear extension of O ($i.e$, < is a total order compatible with th partial order $\prec$ ) 
+\item$O_i$ is a linear extension of O ($i.e$, < is a total order compatible with the partial order $\prec$ ) 
 \item for any two operations $u,v \in U$, if $site(v) = i$ and $u < v$ in $O_i$ then $u \prec v$
 \end{enumerate} 
 \end{itemize}
@@ -148,7 +148,7 @@ Date\newline
 \begin{frame}
 \frametitle{RedBlue Consistency - Definition}
 \begin{itemize}
-\item RedBlue consistency $\colon$ A replicated sytem os O-RedBlue consistent(or short,RedBlue consistent) if each site i applies operations according to an i-causal serialization of RedBlue order $O$.
+\item RedBlue consistency $\colon$ A replicated sytem is O-RedBlue consistent(or short, RedBlue consistent) if each site i applies operations according to an i-causal serialization of RedBlue order $O$.
 \end{itemize}
 \end{frame}
 
@@ -394,7 +394,7 @@ The procedure for deciding which shadow operations can be blue or must be red if
 \end{itemize} 
 Two main tasks :
 \begin{itemize}
-\item Decomplosing the application into a generator and shadow operation
+\item Decomposing the application into a generator and shadow operation
 \item Labeling the shadow operations appropriately
 \end{itemize}
 \end{frame}
@@ -416,7 +416,7 @@ Two main tasks :
 \begin{frame}
 \frametitle{TPC-W}
 \begin{itemize}
-\item Serves 14 diferent user requests such as browsing, searching, adding products to a shopping cart or placing an order.
+\item Serves 14 different user requests such as browsing, searching, adding products to a shopping cart or placing an order.
 \item Each user request generates one to four transactions that access state stored across eight different tables.
 \item Shopping cart can be shared by multiple users across multiple sessions.
 \end{itemize}
@@ -483,7 +483,7 @@ Two main tasks :
 \item Each user issues requests accessing a random record from a MySQL database.
 \item Each request maps to a single shadow operation
 \item A request is blue if it maps to a blue shadow operation and red otherwise
-\item Dataset consists of 10 tables,each initialized with 1000000 records,each record has 1 text and 4 integer attributes. The total size of the dataset is 1.0 GB.
+\item Dataset consists of 10 tables,each initialized with 1,000,000 records, each record has 1 text and 4 integer attributes. The total size of the dataset is 1.0 GB.
 \end{itemize}
 \end{frame}
 
