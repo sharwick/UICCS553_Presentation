@@ -37,7 +37,7 @@ Date\newline
 \item To improve user-experience, services replicate  system state across geographical diverse sites.
 \item Performance vs Consistency
 \begin{itemize}
-\item Amazon\'s Dynamo - eventual consistency where state temporarily diverge.
+\item Amazon\'s Dynamo - eventual consistency where state temporarily converge.
 \item Yahoo PNUTS - avoids state divergence by requiring all operations that update the service state to be funneled through a primary site and thus incurring increased latency.
 \end{itemize}
 \end{enumerate}
@@ -75,7 +75,7 @@ Date\newline
 % --------------------------------------------------- Slide --4
 
 \begin{frame}
-\frametitle{Related Work: Target end-to-end Properties}
+\frametitle{Related Work: Consistency}
 \begin{figure}[t]
 \includegraphics[width=10cm]{pic1.jpg}
 \centering
@@ -85,9 +85,14 @@ Date\newline
 % --------------------------------------------------- Slide --5
 
 \begin{frame}
-\frametitle{Related Work: Strong vs Weak Consistency}
+\frametitle{Related Work: Levels of Consistency}
 \begin{enumerate}
-\item
+\item Strong Consistency - Replicated systems behave like a single server that serialize all operations.
+\item Timeline/Snapshot Consistency - THere is a total order for updates to the service state but gives the option of reading a consistent but dated view of the service.
+\item Fork Consistency - Relaxes strong consistency by allowing users to observe distinct casual histories.
+\item Eventual Consistency - All replicas "eventually" diverge at some state.
+\item Multi Consistency - Other systems expose multiple values from divergent branches in operation replies either directly to the client or to an application-specific conflict resolution procedure.
+\item RedBlue Consistency - Operations have multiple consistency levels
 \end{enumerate}
 
 \end{frame}
@@ -98,7 +103,8 @@ Date\newline
 \begin{frame}
 \frametitle{Related Work: Other}
 \begin{enumerate}
-\item
+\item Consistency Rationing - Consistency guarantees associated with the data instead of the operation.Also switches consistency levels at runtime.
+\item TACT - bounds the amount of inconsisteny based on parameters like numeric errors,order errors, staleness etc.
 \end{enumerate}
 
 \end{frame}
@@ -107,9 +113,15 @@ Date\newline
 % --------------------------------------------------- Slide --7
 
 \begin{frame}
-\frametitle{System Model}
+\frametitle{System Model - Assumptions}
 \begin{enumerate}
-\item
+\item A distributed system with state fully replicated across $k$ sites denoted $site_0 \ldots site_{k-1}$
+\item $s \in S$ denotes a system state and $u,v \in O$ a set of operations. 
+\item Initial State - $S_0$. When operation $u$ is applied it goes to state $S'$. So $S' = S + u$
+\item $ \forall$ S $\in S,$ S$+u+v = $ S $+v+u$
+\item A state $S$ is valid if it satisfies all these invariants.
+\item Each $u$ is submitted to one site which is called $u's$ primary site and denoted by $site(u)$.
+\item The system later replicates $u$ to the other sites.
 \end{enumerate}
 
 \end{frame}
@@ -118,9 +130,15 @@ Date\newline
 
 \begin{frame}
 \frametitle{RedBlue Consistency}
-\begin{enumerate}
-\item
-\end{enumerate}
+\begin{itemize}
+\item RedBlue order $\colon$ Given a set of operations $U = B \cup R$,where $B \cap R = \emptyset$, a RedBlue order is a partial order $O = ( U, \prec)$ with the restriction that $\forall u,v \in R$ such that $u \neq v, u \prec v $ or $v \prec u$ ($i.e.$ red operations are totally ordered).
+
+\item Causal Serialization $\colon$ Given a site $i$, $O_i = (U, <)$ is an $i$-causal serialization(or short, a causal serialization) of RedBlue order $O = ( U, \prec)$ if 
+ \begin{enumerate}
+\item$O_i$ is a linear extension of O ($i.e$, < is a total order compatible with th partial order $\prec$ ) 
+\item for any two operations $u,v \in U$, if $site(v) = i$ and $u < v$ in $O_i$ then $u \prec v$
+\end{enumerate} 
+\end{itemize}
 
 \end{frame}
 
@@ -129,41 +147,404 @@ Date\newline
 
 \begin{frame}
 \frametitle{RedBlue Consistency - Definition}
-\begin{enumerate}
-\item
-\end{enumerate}
-
+\begin{itemize}
+\item RedBlue consistency $\colon$ A replicated sytem os O-RedBlue consistent(or short,RedBlue consistent) if each site i applies operations according to an i-causal serialization of RedBlue order $O$.
+\end{itemize}
 \end{frame}
 
-% --------------------------------------------------- Slide --8
+% --------------------------------------------------- Slide --8-1
 
 \begin{frame}
-\frametitle{State Convergence and RedBlue Bank}
-\begin{enumerate}
-\item
-\end{enumerate}
+\frametitle{Example}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic2.jpg}
+\centering
+\end{figure}
+\end{frame}
 
+% --------------------------------------------------- Slide --8-2
+
+\begin{frame}
+\frametitle{Example}
+\begin{figure}[t]
+\includegraphics[width=7cm]{pic3.jpg}
+\centering
+\end{figure}
 \end{frame}
 
 % --------------------------------------------------- Slide --9
 
 \begin{frame}
-\frametitle{Replicating side effects - Defining shadow operations}
-\begin{enumerate}
-\item
-\end{enumerate}
+\frametitle{State Convergence }
+\begin{itemize}
+\item A RedBlue consistent system is state convergent if all causal serializations of the underlying RedBlue order $O$ reach the same state $S$.
+\end{itemize}
 
 \end{frame}
+
+% --------------------------------------------------- Slide --9-1
+
+\begin{frame}
+\frametitle{State Convergence:Example }
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic4.jpg}
+\centering
+\end{figure}
+
+\end{frame}
+
+% --------------------------------------------------- Slide --9-2
+
+\begin{frame}
+\frametitle{State Convergence:Example }
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic5.jpg}
+\centering
+\end{figure}
+\end{frame}
+
+
+% --------------------------------------------------- Slide --9-3
+
+\begin{frame}
+\frametitle{State Convergence:Theorem }
+\begin{theorem}
+Given a RedBlue order O, if all blue operations are globally commutative then any $O$-RedBlue consistent system is state convergent
+\end{theorem}
+
+\end{frame}
+
 
 % --------------------------------------------------- Slide --10
 
 \begin{frame}
-\frametitle{Revisiting RedBlue consistency}
+\frametitle{Replicating side effects -Generator Operation and Shadow Operation}
 \begin{enumerate}
-\item
+\item Generator Operation $g_u$ - executed only at primary site against some system state $S$.
+\item Shadow Operation $h_u(S)$ - executed at every site(including the primary site)
+\end{enumerate}
+\end{frame}
+
+
+% --------------------------------------------------- Slide --10--1
+
+\begin{frame}
+\frametitle{Replicating side effects - Defining shadow operations}
+\begin{enumerate}
+\item Correct Generator/ Shadow Operations $\colon$ The decomposition of operation $u$ into generator and shadow operations is correct if for all states $S$, the generator operation $g_u$ has no effect and the generated shadow operation $h_u(S)$ has the same effect as $u$, $i.e.$, for any state $S: S + g_u = S$ and $S + h_u(S) = S + u$
 \end{enumerate}
 
 \end{frame}
+
+% --------------------------------------------------- Slide --11
+
+\begin{frame}
+\frametitle{Replicating side effects -Revisiting RedBlue consistency}
+\begin{enumerate}
+\item Given a site $i$, $O_i = (U \cup V_i, <)$ is an $i$-causal serialization of RedBlue order $O = (U , \prec)$ if
+\begin{itemize}
+\item $O_i$ is a total order;
+\item $(U,<)$ is a linear extension of $O$;
+\item For any $h_v(S) \in U$ generated by $g_v \in V_i$, $S$ is the state obtained after applying the sequence of shadow operations preceeding $g_v$ in $O_i$;
+\item For any $g_v \in V_i$ and $h_u(S) \in U$, $h_u(S) < g_v$ in $O_i$ iff $h_u(S) \prec h_v(S')$ in $O$.
+\end{itemize}
+
+\end{enumerate}
+
+\end{frame}
+
+
+% --------------------------------------------------- Slide --11-1
+
+\begin{frame}
+\frametitle{Shadow Banking and Invariants - Example}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic6.jpg}
+\centering
+\end{figure}
+
+\end{frame}
+
+% --------------------------------------------------- Slide --11-2
+
+\begin{frame}
+\frametitle{Shadow Banking and Invariants - Example}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic7.jpg}
+\centering
+\end{figure}
+
+\end{frame}
+
+% --------------------------------------------------- Slide --11-3
+
+\begin{frame}
+\frametitle{Shadow Banking and Invariants - Example}
+\begin{itemize}
+\item Invariant Safe - Shadow operation $h_u(S)$ is invariant safe if for all valid states $S$ and $S'$, the state $S' + h_u(S)$ is also valid.
+\end{itemize}
+\begin{theorem}
+If all shadow operations are correct and all blue shadow operations are invariant safe and globally commutative,then for any execution of that system that is RedBlue consistent, no site is ever in an invalid state.
+\end{theorem}
+\end{frame}
+
+% --------------------------------------------------- Slide --12
+
+\begin{frame}
+\frametitle{What can be blue? What can be red?}
+The procedure for deciding which shadow operations can be blue or must be red if a RedBlue consistent system is to provide both state convergence and invariant preservation:
+\begin{enumerate}
+\item For any pair of non-commutative shadow operations $u$ and $v$, label both $u$ and $v$ red.
+\item For any shadow operation $u$ that may result in an invariant being violated, label $u$ red.
+\item Label all non-red shadow operations blue.
+\end{enumerate}
+
+\end{frame}
+
+% --------------------------------------------------- Slide --12-1
+
+\begin{frame}
+\frametitle{Shadow Banking and Invariants - Example}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic8.jpg}
+\centering
+\end{figure}
+
+\end{frame}
+
+% --------------------------------------------------- Slide --12-2
+
+\begin{frame}
+\frametitle{Shadow Banking and Invariants - Example}
+\begin{figure}[t]
+\includegraphics[width=9cm]{pic9.jpg}
+\centering
+\end{figure}
+
+\end{frame}
+
+
+
+
+% --------------------------------------------------- Slide --14
+
+\begin{frame}
+\frametitle{Gemini Design and Implementation - Prototype}
+\begin{enumerate}
+\item It consisted of 10K lines of java code and uses MySQL as its storage back-end
+\item Each Gemini site consists of :
+\begin{itemize}
+\item a storage engine
+\item a proxy server
+\item a concurrency coordinator
+\item a data writer
+\end{itemize}
+\item The single site is replicated across multiple sites.
+\end{enumerate}
+\end{frame}
+
+% --------------------------------------------------- Slide --14-1
+
+\begin{frame}
+\frametitle{Gemini Design and Implementation - Basic Flow}
+\begin{enumerate}
+\item User issues request to a proxy server located at the closest site.
+\item The proxy server processes the request by executing an appropriate application transaction which is implemented as a single Gemini operation. 
+\item Storage Engine - Relational Database
+\item Scratchpad Operations - Temporary tables
+\end{enumerate}
+\end{frame}
+
+% --------------------------------------------------- Slide --14-1
+
+\begin{frame}
+\frametitle{Gemini Design and Implementation - Basic Flow}
+\begin{enumerate}
+\item User issues request to a proxy server located at the closest site.
+\item The proxy server processes the request by executing an appropriate application transaction which is implemented as a single Gemini operation. 
+\item Storage Engine - Relational Database
+\item Scratchpad Operations - Temporary tables
+\end{enumerate}
+\end{frame}
+
+
+
+
+
+% --------------------------------------------------- Slide --14-2
+
+\begin{frame}
+\frametitle{Gemini Design and Implementation - Failure Handling}
+\begin{enumerate}
+\item Isolated Component Failure - Standard state machine replication techniques can be employes to make each component robust.
+\item Site Failure - A fault tolerance consensus protocol like Paxos can be used.
+\item Operation Propagation - This can be addressed by using standard techniques for exchaning causal logs or reliable multicast.
+\item Cross-session monotonicity - This can be addressed by allowing the user to specify a "last read" version when starting a new session or requiring the user to cache all relevant requests in order to reply them when connecting to a new site.
+\end{enumerate}
+\end{frame}
+
+% --------------------------------------------------- Slide --15
+
+\begin{frame}
+\frametitle{Case Studies}
+\begin{itemize}
+\item TPC-W shopping cart benchmark
+\item RUBiS auction benchmark
+\item Quoddy social networking application
+\end{itemize} 
+Two main tasks :
+\begin{itemize}
+\item Decomplosing the application into a generator and shadow operation
+\item Labeling the shadow operations appropriately
+\end{itemize}
+\end{frame}
+
+% --------------------------------------------------- Slide --15-1
+
+\begin{frame}
+\frametitle{Original application to RedBlue Consistent}
+\begin{figure}[t]
+\includegraphics[width=9cm]{pic10.jpg}
+\centering
+\end{figure}
+
+\end{frame}
+
+
+% --------------------------------------------------- Slide --15-2
+
+\begin{frame}
+\frametitle{TPC-W}
+\begin{itemize}
+\item Serves 14 diferent user requests such as browsing, searching, adding products to a shopping cart or placing an order.
+\item Each user request generates one to four transactions that access state stored across eight different tables.
+\item Shopping cart can be shared by multiple users across multiple sessions.
+\end{itemize}
+\end{frame}
+
+% --------------------------------------------------- Slide --15-3
+
+\begin{frame}
+\frametitle{TPC-W - Writing TPC-W generator and shadow operations}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic11.jpg}
+\centering
+\end{figure}
+\end{frame}
+
+% --------------------------------------------------- Slide --15-4
+
+\begin{frame}
+\frametitle{TPC-W - Writing TPC-W generator and shadow operations}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic12.jpg}
+\centering
+\end{figure}
+\end{frame}
+
+% --------------------------------------------------- Slide --15-5
+
+\begin{frame}
+\frametitle{TPC-W - Writing TPC-W generator and shadow operations}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic13.jpg}
+\centering
+\end{figure}
+\end{frame}
+
+
+% --------------------------------------------------- Slide --16
+
+\begin{frame}
+\frametitle{Evaluation-Experimental Setup}
+\begin{itemize}
+\item Experiments were run on Amazon EC2 using 5 virtual machine instances located in 5 sites - US east(UE), US west(UW), Ireland(IE), Brazil(BR) and Singapore(SG).
+\item Each VM has 8 virtual cores and 15 GB of RAM. VMs run Debian 6( Squeeze) 64 bit, MYSQL 5.5.18,Tomcat 6.0.35 and Sun Java SDK 1.6.
+\end{itemize}
+\end{frame}
+
+
+% --------------------------------------------------- Slide --16-1
+
+\begin{frame}
+\frametitle{Evaluation-Experimental Setup}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic14.jpg}
+\centering
+\end{figure}
+\end{frame}
+
+
+% --------------------------------------------------- Slide --17
+
+\begin{frame}
+\frametitle{Evaluation-Microbenchmark}
+\begin{itemize}
+\item Each user issues requests accessing a random record from a MySQL database.
+\item Each request maps to a single shadow operation
+\item A request is blue if it maps to a blue shadow operation and red otherwise
+\item Dataset consists of 10 tables,each initialized with 1000000 records,each record has 1 text and 4 integer attributes. The total size of the dataset is 1.0 GB.
+\end{itemize}
+\end{frame}
+
+
+% --------------------------------------------------- Slide --17-1
+
+\begin{frame}
+\frametitle{Evaluation-Microbenchmark}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic15.jpg}
+\centering
+\end{figure}
+\end{frame}
+
+
+% --------------------------------------------------- Slide --18
+
+\begin{frame}
+\frametitle{Evaluation-Peak Throughput}
+\begin{figure}[t]
+\includegraphics[width=10cm]{pic16.jpg}
+\centering
+\end{figure}
+\end{frame}
+
+% --------------------------------------------------- Slide --19
+
+\begin{frame}
+\frametitle{Evaluation-TPC-W}
+\begin{figure}[t]
+\includegraphics[width=5cm]{pic17.jpg}
+\centering
+\end{figure}
+\begin{figure}[t]
+\includegraphics[width=5cm]{pic18.jpg}
+\centering
+\end{figure}
+\end{frame}
+
+
+
+% --------------------------------------------------- Slide --20
+
+\begin{frame}
+\frametitle{Conclusion}
+
+\end{frame}
+% --------------------------------------------------- Slide --19-1
+
+\begin{frame}
+\frametitle{Evaluation-TPC-W}
+\begin{figure}[t]
+\includegraphics[width=5cm]{pic19.jpg}
+\centering
+\end{figure}
+\begin{figure}[t]
+\includegraphics[width=5cm]{pic20.jpg}
+\centering
+\end{figure}
+\end{frame}
+
 
 
 
