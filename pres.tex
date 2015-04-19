@@ -307,9 +307,19 @@ April 2013 \newline
 
 % --------------------------------------------------- Slide --
 \begin{frame}
+\frametitle{Eiger: Client Library}
+\begin{itemize}
+\item Manages read and write algorithms
+\item Tracks causality by maintaining 1-hop dependencies
+\end{itemize}  
+\end{frame}
+
+
+% --------------------------------------------------- Slide --
+\begin{frame}
 \frametitle{Eiger: Read Algorithm}
 \begin{itemize}
-\item Non-blocking
+\item Non-blocking: other processes can read
 \item Partition Tolerant
 \item 1 or 2 rounds of non-blocking parallel reads
 \end{itemize}  
@@ -338,21 +348,42 @@ April 2013 \newline
 \frametitle{Eiger: Write Algorithm}
 \begin{itemize}
 \item Atomically write set of keys
-\pause \item Lock free (and thus low latency)
-\pause \item Does not block concurrent reads
+\item Lock free (and thus low latency)
+\item Does not block concurrent reads
+\end{itemize}  
+\end{frame}
+
+
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: Write Algorithm}
+Three parties involved
+\begin{itemize}
+	\item Client - requests write to many servers
+	\item Coordinator server - a randomly chosen server from list of transaction destinations
+	\item Cohort server - all other destinations
 \end{itemize}  
 \end{frame}
 
 % --------------------------------------------------- Slide --
 \begin{frame}
 \frametitle{Eiger: Write Algorithm}
-\begin{itemize}
-	\item Example:
-\end{itemize}  
+Example:
+\includegraphics[scale=0.5]{Figure_Write_Transaction.png}
 \end{frame}
 
-
-
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: Write Algorithm}
+Three parties involved
+\begin{itemize}
+	\item Step 1: Break up transaction into a separate request for each destination.
+	\item Step 2: Randomly choose coordinator and send transactions to all destinations.
+	\item Step 3: Cohorts servers send notification to coordinator.
+	\item Step 4: Coordinator runs dependency checks
+\end{itemize}  
+\end{frame}
 
 % --------------------------------------------------- Slide --
 \begin{frame}
