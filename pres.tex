@@ -571,11 +571,11 @@ April 2013 \newline
 \item Consider an example from Facebook
 \pause\item Joe performs 2 actions:
 	\begin{itemize}
-		\pause\item Defriend boss.
-		\pause\item Make snarky comment about boss and promise to quit.
+		\item Defriend boss.
+		\item Make snarky comment about boss and promise to quit.
 	\end{itemize}
-\pause\item In an \textcolor{red}{eventually} consistent system, these can be viewed in the wrong order for a period time, earning Joe his first unemployment check.
-\pause\item This won't happen with \textcolor{green}{causal} consistency.
+\item In an \textcolor{red}{eventually} consistent system, these can be viewed in the wrong order for a period time, earning Joe his first unemployment check.
+\item This won't happen with \textcolor{green}{causal} consistency.
 
 \end{itemize}  
 \end{frame}
@@ -584,11 +584,11 @@ April 2013 \newline
 \begin{frame}
 \frametitle{Consistency - Causal versus Eventual}
 \begin{itemize}
-\pause \item Eventual Consistency
+	\item Eventual Consistency
 	\begin{itemize}
 		\item At some point, the replicas will converge
 		\item Until then, no guarantees
-		\pause\item \textcolor{red}{Joe's boss might see his whining.}	
+		\item \textcolor{red}{Joe's boss might see his whining.}	
 	\end{itemize}
 
 \pause \item Causal Consistency
@@ -596,7 +596,7 @@ April 2013 \newline
 		\item At a single processor, serial order of events determines causal order
 		\item Reads are causally ordered after their writes across processors
 		\item Transitive closure of these two properties
-		\pause\item \textcolor{green}{Joe is safe to gripe.}
+		\item \textcolor{green}{Joe is safe to gripe.}
 	\end{itemize}
 
 \end{itemize}  
@@ -610,8 +610,8 @@ April 2013 \newline
 
 \item We modify an eventually consistent system to get a causally consistent one
 \item Extend Cassandra to get Eiger
-\pause \item Take slight hit in \textcolor{red}{throughput} \newline to get stronger version of \textcolor{green}{consistency}
-\pause \item Maintain low latency
+\item Take slight hit in \textcolor{red}{throughput} \newline to get stronger version of \textcolor{green}{consistency}
+\item Maintain low latency
 
 \end{itemize}  
 \end{frame}
@@ -620,14 +620,14 @@ April 2013 \newline
 \begin{frame}
 \frametitle{Contributions of the paper} 
 \begin{itemize}
-\pause \item Eiger
+\item Eiger
 	\begin{itemize}
 		\item Low Latency
 		\item High throughput (slightly lower than Cassandra)
 		\item Causal Consistency (rather than eventual as in Cassandra)
 	\end{itemize}
-\pause \item Read Only Algorithm
-\pause \item Write Only Algorithm
+\item Read Only Algorithm
+\item Write Only Algorithm
 \end{itemize}  
 \end{frame}
 
@@ -635,7 +635,7 @@ April 2013 \newline
 \begin{frame}
 \frametitle{Background}
 \begin{itemize}
-\pause \item Cassandra
+\item Cassandra
 	\begin{itemize}
 		\item Designed by Facebook to search inbox messages (has since been replaced by Hbase for better scalability)
 		\item Other companies are still using Cassandra (e.g., Netflix and Apple)
@@ -656,7 +656,7 @@ April 2013 \newline
 \begin{itemize}
 \item Hierarchical Column families: 3 tiers
 
-\pause \item Example:
+\item Example:
 	\begin{itemize}
 		\item Super Family = Association
 		\item Family = Friends
@@ -671,7 +671,7 @@ April 2013 \newline
 \begin{frame}
 \frametitle{Eiger: Operations}
 \begin{itemize}
-\pause \item Cassandra has only 3 operations (key determines row)
+\item Cassandra has only 3 operations (key determines row)
 	\begin{itemize}
 		\item Insert(table, key, rowMutation)
 		\item Get(table, key, columnName)
@@ -682,6 +682,7 @@ April 2013 \newline
 		\item Batch Mutate: insert or delete multiple keys as a group of independent operations
 		\item Atomic Mutate: insert or delete multiple keys in a single atomic batch
 		\item Multiget Slice: read multiple columns/keys
+		\item Multiget Slice by Time
 	\end{itemize}	
 \end{itemize}  
 \end{frame}
@@ -692,9 +693,19 @@ April 2013 \newline
 \begin{itemize}
 \item Manages read and write algorithms
 \item Tracks causality by maintaining 1-hop dependencies
+\item For an atomic write, no write is applied in a cluster until after all the dependencies have been applied.  \textcolor{red}{This is necessary for causal consistency.}
+\item Dependencies are on operations rather than values (as in COPS). 
 \end{itemize}  
 \end{frame}
 
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: One-Hop Dependencies}
+
+Example:  For w8, only w6 and w5 are stored.
+
+\includegraphics[scale=0.5]{Figure_Dependencies.png}
+\end{frame}
 
 % --------------------------------------------------- Slide --
 \begin{frame}
@@ -717,7 +728,7 @@ April 2013 \newline
 \frametitle{Eiger: Read Algorithm}
 \begin{itemize}
 \item Step 1: Find latest lower bound, L
-\item Step 2: Find lowest upper bound that is higher than H
+\item Step 2: Find lowest upper bound that is higher than L
 \newline If all upper bounds are higher than L then we are done.  If not, continue. 
 \item Step 3: For any reads that had an upper bound lower than L, read again.
 \end{itemize}  
@@ -747,6 +758,22 @@ Three parties involved
 \end{itemize}  
 \end{frame}
 
+
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{Eiger: Write Algorithm}
+Three parties involved
+\begin{itemize}
+	\item Step 1: Break up transaction into a separate request for each destination.
+	\item Step 2: Randomly choose coordinator and send transactions to all destinations.
+	\item Step 3: Cohort servers send notification to coordinator.
+	\item Step 4: Coordinator runs dependency checks
+	\item Step 5: 2 Phase commit (to ensure all-or-nothing)
+	\item Step 6: Coordinator sends ACK to client
+\end{itemize}  
+\end{frame}
+
 % --------------------------------------------------- Slide --
 \begin{frame}
 \frametitle{Eiger: Write Algorithm}
@@ -756,51 +783,49 @@ Example:
 
 % --------------------------------------------------- Slide --
 \begin{frame}
-\frametitle{Eiger: Write Algorithm}
-Three parties involved
+\frametitle{Evaluation}
+Comparison to Cassandra:
 \begin{itemize}
-	\item Step 1: Break up transaction into a separate request for each destination.
-	\item Step 2: Randomly choose coordinator and send transactions to all destinations.
-	\item Step 3: Cohorts servers send notification to coordinator.
-	\item Step 4: Coordinator runs dependency checks
-\end{itemize}  
+	\item Within 7\% of throughput Using Facebook data
+\end{itemize}
+\includegraphics[scale=0.6]{Figure_Facebook_Throughput.png}  
 \end{frame}
 
 % --------------------------------------------------- Slide --
 \begin{frame}
 \frametitle{Evaluation}
+Comparison to Cassandra:
 \begin{itemize}
-\pause \item Comparison to Cassandra
-		\begin{itemize}
-			\item Within 7\% of throughput Using Facebook-like data
-			\begin{itemize}
-				\item Ops/sec
-				\item Keys/sec
-				\item Columns/sec
-			\end{itemize}
-		\end{itemize}
-\end{itemize}  
+	\item Cassandra had median latency of 0.38ms, whereas Eiger had 0.78ms
+	\item Thus, there is about a factor of 2 difference
+	\item Strongly Consistent Cassandra had 85.21ms latency
+\end{itemize}
 \end{frame}
+
 
 % --------------------------------------------------- Slide --
 \begin{frame}
-\frametitle{Related Research}
-\begin{itemize}
-\pause \item Mahajan et al. showed that Causal Consistency strongest that guarantees low latency.
-\end{itemize}  
+\frametitle{Evaluation}
+Almost linear scaling:
+\includegraphics[scale=0.6]{Figure_Almost_Linear.png}  
 \end{frame}
+
+
+
+
+
+
 
 % --------------------------------------------------- Slide --
 \begin{frame}
 \frametitle{Conclusion: Relationship between 2 Papers}
 \begin{itemize}
-\pause \item Similarities
+\item Similarities
 	\begin{itemize}
 		\item Geo-replicated Systems
-		\item Provide consistency
-		\item Decrease latencies
+		\item Provide improvement in consistency
 	\end{itemize}
-\pause \item Differences
+\item Differences
 	\begin{itemize}
 		\item Li: Latency versus Consistency.
 			\begin{itemize}
@@ -813,6 +838,12 @@ Three parties involved
 	\end{itemize}
 
 \end{itemize}  
+\end{frame}
+
+% --------------------------------------------------- Slide --
+\begin{frame}
+\frametitle{The End}
+\LARGE{Thank you!}
 \end{frame}
 
 
@@ -843,22 +874,10 @@ Wyatt Lloyd, Michael J. Freedman, Michael Kaminsky, and David G. Andersen, , Aug
 \textit{http://techblog.netflix.com/search/label/Cassandra}
 January 27, 2015
 
-
-
-\end{itemize}  
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Bibliography}
-
-\begin{itemize}
-\item \textit{http://wiki.apache.org/cassandra}
+%\item \textit{http://wiki.apache.org/cassandra}
 
 \end{itemize}  
 \end{frame}
-
-
 
 
 \end{document} 
